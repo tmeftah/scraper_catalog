@@ -40,6 +40,7 @@ def load_products() -> List[Dict[str, Any]]:
     result = []
     for p in data:
         p = {
+            "id": p.get("id"),  # <- include the ID
             "title": p.get("title"),
             "price": p.get("price"),
             "description": p.get("description"),
@@ -160,6 +161,13 @@ def find_product_by_title(title: str) -> Optional[Dict[str, Any]]:
     return None
 
 
+def find_product_by_id(pid: str) -> Optional[Dict[str, Any]]:
+    for p in PRODUCTS:
+        if (p.get("id") or "") == pid:
+            return p
+    return None
+
+
 def resolve_page_size(per_page: str, total_items: int) -> int:
     if str(per_page).lower() in ("all", "*"):
         # show everything on one page
@@ -225,7 +233,8 @@ async def index(
                 "title": p.get("title"),
                 "thumbnail": product_thumbnail_url(p),
                 "final_price": final_txt,
-                "detail_href": f"/product?title={quote_plus(p.get('title') or '')}&margin={margin}&q={quote_plus(q)}&per_page={quote_plus(per_page)}",
+                # Use product ID here
+                "detail_href": f"/product?id={quote_plus(p.get('id') or '')}&margin={margin}&q={quote_plus(q)}&per_page={quote_plus(per_page)}",
             }
         )
 
@@ -261,7 +270,7 @@ async def index(
 @app.get("/product", response_class=HTMLResponse)
 async def product_detail(
     request: Request,
-    title: str,
+    id: str,
     margin: int = 30,
     q: str = "",
     per_page: str = PER_PAGE_DEFAULT,
@@ -272,8 +281,8 @@ async def product_detail(
 
     if margin not in MARGIN_CHOICES:
         margin = 30
-    title = unquote_plus(title)
-    p = find_product_by_title(title)
+
+    p = find_product_by_id(id)
     if not p:
         raise HTTPException(status_code=404, detail="Product not found")
 

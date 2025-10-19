@@ -6,6 +6,7 @@ import shutil
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
 
+import uuid
 import aiohttp
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
@@ -28,6 +29,28 @@ TIMEOUT = 30  # <- total timeout per request (seconds)
 
 DOWNLOAD_SKIP_EXISTS = True  # <- skip downloads if file already exists
 CLEAN_BEFORE_RUN = True  # <- remove OUTPUT and IMAGES_DIR at startup
+
+
+def canonical_product_url(product_url: str) -> str:
+    """
+    Normalize the product URL for ID generation:
+    - Keep scheme, host (lowercased), and path
+    - Drop query and fragment
+    - Strip trailing slash from path
+    """
+    parsed = urlparse(product_url or "")
+    scheme = parsed.scheme or "https"
+    netloc = parsed.netloc.lower()
+    path = parsed.path.rstrip("/") or "/"
+    return f"{scheme}://{netloc}{path}"
+
+
+def product_unique_id(product_url: str) -> str:
+    """
+    Deterministic unique ID based on the canonical product URL using UUID v5.
+    """
+    canonical = canonical_product_url(product_url)
+    return str(uuid.uuid5(uuid.NAMESPACE_URL, canonical))
 
 
 def slugify(text, fallback="product"):
@@ -122,7 +145,11 @@ def parse_product_details(soup, product_url):
     price = price_el.get_text(strip=True) if price_el else None
     description = desc_el.get_text(" ", strip=True) if desc_el else None
 
+    # Unique, stable ID from canonical URL
+    uid = product_unique_id(product_url)
+
     return {
+        "id": uid,  # <- added
         "title": title,
         "price": price,
         "description": description,
