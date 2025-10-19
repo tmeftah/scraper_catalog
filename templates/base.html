@@ -1,0 +1,104 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <title>{% block title %}Catalog{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+    crossorigin="anonymous"
+  />
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --hero-gradient: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+      --card-radius: 14px;
+      --shadow-soft: 0 10px 30px rgba(0,0,0,0.08);
+      --shadow-hover: 0 12px 36px rgba(0,0,0,0.12);
+    }
+    html, body { font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; }
+    body {
+      padding-top: 4.5rem;
+      background:
+        radial-gradient(1200px 600px at 100% 0%, rgba(13,110,253,0.07), rgba(13,110,253,0)) no-repeat,
+        radial-gradient(800px 400px at 0% 100%, rgba(102,16,242,0.08), rgba(102,16,242,0)) no-repeat;
+    }
+    .navbar-brand { font-weight: 700; letter-spacing: 0.3px; }
+    .hero {
+      background: var(--hero-gradient); color: #fff; border-radius: 18px;
+      padding: 2.25rem; box-shadow: var(--shadow-soft);
+    }
+    .card.product-card { border: none; border-radius: var(--card-radius); box-shadow: var(--shadow-soft); overflow: hidden; }
+    .card.product-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); transition: .2s; }
+    .card-img-top { object-fit: cover; height: 200px; background-color: rgba(0,0,0,0.03); }
+    .big-price { font-weight: 800; font-size: 1.6rem; line-height: 1.1; color: #0d6efd; }
+    .thumb-strip img { height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; }
+    .thumb-strip img:hover { transform: translateY(-2px); box-shadow: var(--shadow-soft); opacity: 0.9; transition: .15s; }
+  </style>
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="/">Catalog</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div id="navbarContent" class="collapse navbar-collapse">
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <!-- Global margin control (no label/%) -->
+          <form class="d-flex align-items-center" method="get" action="/">
+            <input type="hidden" name="q" value="{{ q|default('') }}">
+            <input type="hidden" name="page" value="1">
+            <input type="hidden" name="per_page" value="{{ per_page|default('20') }}">
+            <select id="marginSelect" name="margin" class="form-select form-select-sm" style="width:auto" onchange="this.form.submit()">
+              {% for m in margin_choices %}
+                <option value="{{ m }}" {% if m == margin %}selected{% endif %}>{{ m }}</option>
+              {% endfor %}
+            </select>
+          </form>
+
+          <!-- Per-page control (20,50,100,all) -->
+          <form class="d-flex align-items-center" method="get" action="/">
+            <input type="hidden" name="q" value="{{ q|default('') }}">
+            <input type="hidden" name="page" value="1">
+            <input type="hidden" name="margin" value="{{ margin }}">
+            <select id="perPageSelect" name="per_page" class="form-select form-select-sm" style="width:auto" onchange="this.form.submit()">
+              {% for p in per_page_choices %}
+                <option value="{{ p }}" {% if p == per_page %}selected{% endif %}>{{ p }}</option>
+              {% endfor %}
+            </select>
+          </form>
+
+          <a class="btn btn-outline-light btn-sm" href="/"><i class="bi bi-grid-3x3-gap-fill me-1"></i> Catalog</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container my-4">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="container my-5">
+    <div class="text-center text-muted small">
+      Built with FastAPI and Bootstrap 5
+    </div>
+  </footer>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"
+  ></script>
+  {% block body_extra %}{% endblock %}
+</body>
+</html>

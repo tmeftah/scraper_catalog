@@ -1,0 +1,132 @@
+<!-- templates/index.html -->
+{% extends "base.html" %} {% block title %}Catalog{% endblock %} {% block
+content %}
+<section class="hero mb-4">
+  <div class="row align-items-center">
+    <div class="col-12 col-lg-9">
+      <h1 class="h2 mb-2">Discover Products</h1>
+      <p class="mb-3">Filter by name and preview final prices.</p>
+      <form method="get" action="/" class="row g-2">
+        <div class="col-12 col-sm-10">
+          <input
+            name="q"
+            value="{{ q or '' }}"
+            class="form-control form-control-lg"
+            type="search"
+            placeholder="Filter by name..."
+            aria-label="Filter by name"
+          />
+        </div>
+        <div class="col-12 col-sm-2 d-grid">
+          <button class="btn btn-light btn-lg" type="submit">
+            <i class="bi bi-search me-1"></i> Search
+          </button>
+        </div>
+        <!-- Keep current margin and per_page on search; reset to page 1 -->
+        <input type="hidden" name="margin" value="{{ margin }}" />
+        <input type="hidden" name="per_page" value="{{ per_page }}" />
+        <input type="hidden" name="page" value="1" />
+      </form>
+      <div class="mt-2 text-light-50">
+        {{ count }} result{{ '' if count == 1 else 's' }}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if pagination.pages > 1 %}
+<nav aria-label="Catalog pagination" class="mb-3">
+  <ul class="pagination">
+    <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+      <a
+        class="page-link"
+        href="/?q={{ q|urlencode }}&margin={{ margin }}&per_page={{ per_page }}&page={{ pagination.prev_page }}"
+        aria-label="Previous"
+      >
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    {% for n in pagination.numbers %}
+    <li class="page-item {% if n == pagination.page %}active{% endif %}">
+      <a
+        class="page-link"
+        href="/?q={{ q|urlencode }}&margin={{ margin }}&per_page={{ per_page }}&page={{ n }}"
+        >{{ n }}</a
+      >
+    </li>
+    {% endfor %}
+    <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+      <a
+        class="page-link"
+        href="/?q={{ q|urlencode }}&margin={{ margin }}&per_page={{ per_page }}&page={{ pagination.next_page }}"
+        aria-label="Next"
+      >
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+{% endif %}
+
+<div class="row">
+  {% if items|length == 0 %}
+  <div class="col-12">
+    <div class="alert alert-info">No products found.</div>
+  </div>
+  {% else %} {% for it in items %}
+  <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+    <div class="card product-card h-100">
+      <img
+        class="card-img-top"
+        src="{{ it.thumbnail }}"
+        alt="{{ it.title|e }}"
+        loading="lazy"
+        referrerpolicy="no-referrer"
+      />
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title">{{ it.title }}</h5>
+        <div class="mt-2">
+          <div class="big-price">{{ it.final_price }}</div>
+        </div>
+        <a class="btn btn-primary mt-auto" href="{{ it.detail_href }}"
+          ><i class="bi bi-eye me-1"></i> View details</a
+        >
+      </div>
+    </div>
+  </div>
+  {% endfor %} {% endif %}
+</div>
+
+{% if pagination.pages > 1 %}
+<nav aria-label="Catalog pagination" class="mt-3">
+  <ul class="pagination">
+    <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+      <a
+        class="page-link"
+        href="/?q={{ q|urlencode }}&margin={{ margin }}&per_page={{ per_page }}&page={{ pagination.prev_page }}"
+        aria-label="Previous"
+      >
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    {% for n in pagination.numbers %}
+    <li class="page-item {% if n == pagination.page %}active{% endif %}">
+      <a
+        class="page-link"
+        href="/?q={{ q|urlencode }}&margin={{ margin }}&per_page={{ per_page }}&page={{ n }}"
+        >{{ n }}</a
+      >
+    </li>
+    {% endfor %}
+    <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+      <a
+        class="page-link"
+        href="/?q={{ q|urlencode }}&margin={{ margin }}&per_page={{ per_page }}&page={{ pagination.next_page }}"
+        aria-label="Next"
+      >
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+{% endif %} {% endblock %}
