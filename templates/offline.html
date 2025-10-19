@@ -1,0 +1,59 @@
+<!-- /offline.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>KYOPS — Offline</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0d6efd" />
+    <style>
+      :root {
+        --blue: #0d6efd;
+        --text: #222;
+      }
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto,
+          "Helvetica Neue", Arial;
+        margin: 0;
+        padding: 2rem;
+        background: #fff;
+        color: var(--text);
+      }
+      .card {
+        max-width: 600px;
+        margin: 2rem auto;
+        border-radius: 14px;
+        border: 1px solid #eee;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+      }
+      h1 {
+        margin: 0 0 0.5rem;
+        font-size: 1.5rem;
+        color: var(--blue);
+      }
+      p {
+        margin: 0.5rem 0;
+      }
+      a.btn {
+        display: inline-block;
+        margin-top: 1rem;
+        padding: 0.5rem 0.9rem;
+        background: var(--blue);
+        color: #fff;
+        text-decoration: none;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>You’re Offline</h1>
+      <p>
+        The KYOPS catalog isn’t available right now. Check your connection and
+        try again.
+      </p>
+      <a class="btn" href="/">Retry</a>
+    </div>
+  </body>
+</html>

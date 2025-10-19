@@ -20,6 +20,7 @@ PER_PAGE_CHOICES = ["20", "50", "100", "all"]
 app = FastAPI()
 
 # Serve product images (always mount, even if dir doesn't exist yet)
+app.mount("/static", StaticFiles(directory=str("static")), name="static")
 app.mount(
     "/images", StaticFiles(directory=str(IMAGES_DIR), check_dir=False), name="images"
 )
