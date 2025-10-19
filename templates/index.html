@@ -44,7 +44,48 @@ content %}
         <span aria-hidden="true">&laquo;</span>
       </a>
     </li>
-    {% for n in pagination.numbers %}
+
+    {% if pagination.pages > 6 %}
+    <li class="page-item {% if 1 == pagination.page %}active{% endif %}">
+      <a
+        class="page-link"
+        href="/?q={{ q|urlencode }}&margin={{ margin }}&per_page={{ per_page }}&page=1"
+        >1</a
+      >
+    </li>
+    {% if pagination.pages >= 2 %}
+    <li class="page-item {% if 2 == pagination.page %}active{% endif %}">
+      <a
+        class="page-link"
+        href="/?q={{ q|urlencode }}&margin={{ margin }}&per_page={{ per_page }}&page=2"
+        >2</a
+      >
+    </li>
+    {% endif %}
+    <li class="page-item disabled">
+      <span class="page-link">&hellip;</span>
+    </li>
+    {% if pagination.pages - 1 > 2 %}
+    <li
+      class="page-item {% if (pagination.pages - 1) == pagination.page %}active{% endif %}"
+    >
+      <a
+        class="page-link"
+        href="/?q={{ q|urlencode }}&margin={{ margin }}&per_page={{ per_page }}&page={{ pagination.pages - 1 }}"
+        >{{ pagination.pages - 1 }}</a
+      >
+    </li>
+    {% endif %}
+    <li
+      class="page-item {% if pagination.pages == pagination.page %}active{% endif %}"
+    >
+      <a
+        class="page-link"
+        href="/?q={{ q|urlencode }}&margin={{ margin }}&per_page={{ per_page }}&page={{ pagination.pages }}"
+        >{{ pagination.pages }}</a
+      >
+    </li>
+    {% else %} {% for n in pagination.numbers %}
     <li class="page-item {% if n == pagination.page %}active{% endif %}">
       <a
         class="page-link"
@@ -52,7 +93,8 @@ content %}
         >{{ n }}</a
       >
     </li>
-    {% endfor %}
+    {% endfor %} {% endif %}
+
     <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
       <a
         class="page-link"
@@ -107,7 +149,48 @@ content %}
         <span aria-hidden="true">&laquo;</span>
       </a>
     </li>
-    {% for n in pagination.numbers %}
+
+    {% if pagination.pages > 6 %}
+    <li class="page-item {% if 1 == pagination.page %}active{% endif %}">
+      <a
+        class="page-link"
+        href="/?q={{ q|urlencode }}&margin={{ margin }}&per_page={{ per_page }}&page=1"
+        >1</a
+      >
+    </li>
+    {% if pagination.pages >= 2 %}
+    <li class="page-item {% if 2 == pagination.page %}active{% endif %}">
+      <a
+        class="page-link"
+        href="/?q={{ q|urlencode }}&margin={{ margin }}&per_page={{ per_page }}&page=2"
+        >2</a
+      >
+    </li>
+    {% endif %}
+    <li class="page-item disabled">
+      <span class="page-link">&hellip;</span>
+    </li>
+    {% if pagination.pages - 1 > 2 %}
+    <li
+      class="page-item {% if (pagination.pages - 1) == pagination.page %}active{% endif %}"
+    >
+      <a
+        class="page-link"
+        href="/?q={{ q|urlencode }}&margin={{ margin }}&per_page={{ per_page }}&page={{ pagination.pages - 1 }}"
+        >{{ pagination.pages - 1 }}</a
+      >
+    </li>
+    {% endif %}
+    <li
+      class="page-item {% if pagination.pages == pagination.page %}active{% endif %}"
+    >
+      <a
+        class="page-link"
+        href="/?q={{ q|urlencode }}&margin={{ margin }}&per_page={{ per_page }}&page={{ pagination.pages }}"
+        >{{ pagination.pages }}</a
+      >
+    </li>
+    {% else %} {% for n in pagination.numbers %}
     <li class="page-item {% if n == pagination.page %}active{% endif %}">
       <a
         class="page-link"
@@ -115,7 +198,8 @@ content %}
         >{{ n }}</a
       >
     </li>
-    {% endfor %}
+    {% endfor %} {% endif %}
+
     <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
       <a
         class="page-link"
