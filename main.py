@@ -3,7 +3,6 @@ from typing import List, Dict, Any, Optional
 import json
 import re
 from urllib.parse import quote_plus, unquote_plus
-from threading import Lock
 
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse
@@ -20,9 +19,7 @@ PER_PAGE_CHOICES = ["20", "50", "100", "all"]
 # FastAPI app
 app = FastAPI()
 
-# Serve product images
-# Use check_dir=False so mounting works even if the directory does not exist yet.
-# New/changed files are served immediately without remounting or restarting.
+# Serve product images (always mount, even if dir doesn't exist yet)
 app.mount(
     "/images", StaticFiles(directory=str(IMAGES_DIR), check_dir=False), name="images"
 )
@@ -32,10 +29,6 @@ templates = Jinja2Templates(directory="templates")
 
 # In-memory products
 PRODUCTS: List[Dict[str, Any]] = []
-
-# Track products.json changes
-_products_mtime_ns: Optional[int] = None
-_products_lock = Lock()
 
 
 def load_products() -> List[Dict[str, Any]]:
@@ -56,39 +49,6 @@ def load_products() -> List[Dict[str, Any]]:
         parse_price_info(p)
         result.append(p)
     return result
-
-
-def _refresh_products_if_changed() -> None:
-    """
-    Reload PRODUCTS if products.json mtime changed.
-    Thread-safe and cheap to call per-request.
-    """
-    global PRODUCTS, _products_mtime_ns
-    try:
-        mtime_ns = PRODUCTS_JSON_PATH.stat().st_mtime_ns
-    except FileNotFoundError:
-        mtime_ns = None
-
-    # Only lock when we actually need to reload (or clear)
-    needs_reload = mtime_ns != _products_mtime_ns
-    if not needs_reload:
-        return
-
-    with _products_lock:
-        # Double-check after acquiring lock
-        try:
-            current_mtime_ns = PRODUCTS_JSON_PATH.stat().st_mtime_ns
-        except FileNotFoundError:
-            current_mtime_ns = None
-
-        if current_mtime_ns == _products_mtime_ns:
-            return  # another request already reloaded
-
-        if current_mtime_ns is None:
-            PRODUCTS = []
-        else:
-            PRODUCTS = load_products()
-        _products_mtime_ns = current_mtime_ns
 
 
 CURRENCY_TOKENS = [
@@ -214,16 +174,8 @@ def resolve_page_size(per_page: str, total_items: int) -> int:
 
 @app.on_event("startup")
 def startup_event():
-    # Initialize PRODUCTS from current file state
-    _refresh_products_if_changed()
-
-
-# Auto-refresh products.json before every request
-@app.middleware("http")
-async def auto_refresh_products(request: Request, call_next):
-    _refresh_products_if_changed()
-    response = await call_next(request)
-    return response
+    global PRODUCTS
+    PRODUCTS = load_products()
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -240,6 +192,8 @@ async def index(
         page = 1
 
     q_norm = q.strip().lower()
+    global PRODUCTS
+    PRODUCTS = load_products()
     filtered = [p for p in PRODUCTS if q_norm in (p.get("title") or "").lower()]
 
     total = len(filtered)
@@ -311,6 +265,10 @@ async def product_detail(
     q: str = "",
     per_page: str = PER_PAGE_DEFAULT,
 ):
+    # Reload products.json on every product detail request
+    global PRODUCTS
+    PRODUCTS = load_products()
+
     if margin not in MARGIN_CHOICES:
         margin = 30
     title = unquote_plus(title)
